@@ -48,12 +48,9 @@ TARGET_CC_ARCH += "${LDFLAGS}"
 
 inherit autotools-brokensep cpan-base
 
-#The CUSTOM_LDSCRIPTS doesn't work with the gold linker
-do_configure:prepend() {
-    if [ "${@bb.utils.filter('DISTRO_FEATURES', 'ld-is-gold', d)}" ]; then
-        sed -i 's/CUSTOM_LDSCRIPTS = yes/CUSTOM_LDSCRIPTS = no/'  Makefile.in
-    fi
-}
+#The CUSTOM_LDSCRIPTS doesn't work with the gold/lld linker
+# always use BFD linker
+LDFLAGS:remove = "-fuse-ld=lld -fuse-ld=gold"
 
 do_install() {
     oe_runmake PREFIX=${prefix} DESTDIR=${D}  \
